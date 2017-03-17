@@ -5,10 +5,8 @@
 #include <algorithm>
 #include <bitset>
 #include <cstring>
-#include <assert.h>
+#include <cassert>
 #include "bit_ops.h"
-#include "utility"
-#include <cmath>
 #include "Chromosome.hpp"
 #include "GA.hpp"
 
@@ -18,12 +16,12 @@ static int Calls = 0;
 constexpr int Dimension = 10;
 constexpr int Generations = 400;
 constexpr int PopulationSize = 100;
-constexpr size_t Crossovers = int(sqrt(PopulationSize));
+constexpr size_t Crossovers = static_cast<size_t >(sqrt(PopulationSize));
 constexpr double MutationRate = 0.225;
 
 constexpr int CrossLoci = 32;
 
-static_assert(CrossLoci%2 == 0, "Even Loci");
+static_assert(CrossLoci % 2 == 0, "Even Loci");
 
 
 class GriewankOrganism : public Organism {
@@ -31,16 +29,14 @@ public:
     GriewankOrganism(std::vector<double> V) : Organism(V) {}
 
 
-    virtual void compute_fitness(const std::vector<std::pair<double, double>>& Limits) override {
+    virtual double compute_fitness(const std::vector<std::pair<double, double>> &Limits) const override {
 
         auto V = this->DNA.get_vect();
 
-        for(size_t i=0; i<Limits.size();i++)
-            if(V.at(i) < Limits.at(i).first || V.at(i) > Limits.at(i).second)
-            {
-                this->fitness = std::numeric_limits<double>::max();
-                return;
-            }
+        for (size_t i = 0; i < Limits.size(); i++)
+            if (V.at(i) < Limits.at(i).first || V.at(i) > Limits.at(i).second)
+                return std::numeric_limits<double>::max();
+
         double res = 0;
         for (const auto &item : V)
             res += item * item / 4000.0;
@@ -49,20 +45,54 @@ public:
         for (const auto &item : V)
             tmp *= cos(item / sqrt(i++));
         res = res - tmp + 1;
-        this->fitness = res;
-
-        std::mt19937 gen;
+        return res;
     }
 };
 
+class Foo {
+public:
+    double fx(const std::vector<double> V, const std::vector<std::pair<double, double>> &Limits) {
+        for (size_t i = 0; i < Limits.size(); i++)
+            if (V.at(i) < Limits.at(i).first || V.at(i) > Limits.at(i).second)
+                return std::numeric_limits<double>::max();
+
+        double res = 0;
+        for (const auto &item : V)
+            res += item * item / 4000.0;
+        double tmp = 1;
+        double i = 1;
+        for (const auto &item : V)
+            tmp *= cos(item / sqrt(i++));
+        res = res - tmp + 1;
+        return res;
+    }
+};
+
+template<class Organism>
+class POrganismFactory : public OrganismFactory<Organism> {
+public:
+    Foo *ptr;
+
+    POrganismFactory(const std::vector<std::pair<double, double>> &Limits,
+                     double MutationRate, size_t CrossLoci, size_t Dimensions,
+                     Foo *ptr) :
+            OrganismFactory<Organism>(Limits, MutationRate, CrossLoci, Dimensions),
+            ptr(ptr)
+    {}
+
+    double compute_fitness(const Organism& org) const override {
+        return ptr->fx(org.DNA.get_vect(), this->Limits);
+    }
 
 
+};
 
 
 int main() {
-    GA<GriewankOrganism> ga(Dimension, PopulationSize, Generations, Crossovers, MutationRate,
-        std::vector<std::pair<double, double>>(10, {-50,50})
-    );
+    auto sof = std::make_shared<POrganismFactory<GriewankOrganism>>(
+            std::vector<std::pair<double, double>>(10, {-50, 50}),
+            MutationRate, CrossLoci, Dimension, new Foo);
+    GA<GriewankOrganism> ga(PopulationSize, Generations, Crossovers, sof);
     ga.run();
     return 0;
 }

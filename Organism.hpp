@@ -17,7 +17,11 @@ public:
     {}
 
 
-    virtual void compute_fitness(const std::vector<std::pair<double, double>>& Limits) = 0;
+    virtual double compute_fitness(const std::vector<std::pair<double, double>>& Limits) const = 0;
+
+    virtual void set_fitness(double value) {
+        fitness = value;
+    }
 
     void print() const {
         std::cout << fitness << "\t";
