@@ -8,6 +8,7 @@
 #include <Nucleotide.hpp>
 
 #include "GA.hpp"
+#include "test.hpp"
 
 static int Calls = 0;
 constexpr int Dimension = 10;
@@ -65,31 +66,52 @@ public:
     }
 };
 
-template<class Organism>
-class POrganismFactory : public OrganismFactory<Organism> {
+
+class POrganismFactory : public OrganismFactory<GriewankOrganism> {
 public:
     Foo *ptr;
 
     POrganismFactory(const std::vector<std::pair<double, double>> &Limits,
                      double MutationRate, size_t CrossLoci, size_t Dimensions,
                      Foo *ptr) :
-            OrganismFactory<Organism>(Limits, MutationRate, CrossLoci, Dimensions),
+            OrganismFactory<GriewankOrganism>(Limits, MutationRate, CrossLoci, Dimensions),
             ptr(ptr)
     {}
 
-    double compute_fitness(const Organism& org) const override {
+    double compute_fitness(const GriewankOrganism& org) const override {
         return ptr->fx(org.DNA.get_vect(), this->Limits);
     }
 
 
 };
 
+class X2Organism : public Organism {
+public:
+    X2Organism(std::vector<double> V) : Organism(V) {}
+
+};
+
+class XOF : public OrganismFactory<X2Organism> {
+public:
+    XOF(const std::vector<std::pair<double, double>> &Limits,
+                     double MutationRate, size_t CrossLoci, size_t Dimensions) :
+            OrganismFactory<X2Organism>(Limits, MutationRate, CrossLoci, Dimensions)
+    {}
+
+    double compute_fitness(const X2Organism& org) const override {
+        auto V = org.DNA.get_vect();
+        return std::accumulate(V.begin(), V.end(), 0, std::plus<double >());
+    }
+};
+
+//class template test<int>;
 
 int main() {
-
-    auto sof = std::make_shared<POrganismFactory<GriewankOrganism>>(
-            std::vector<std::pair<double, double>>(10, {-50, 50}),
-            MutationRate, CrossLoci, Dimension, new Foo);
+    auto Limits = std::vector<std::pair<double, double>>(10, {-50, 50});
+    test<int> a(5);
+    XOF curr(Limits, MutationRate, CrossLoci, Dimension);
+    GriewankOrganism g({10,19});
+    auto sof = std::make_shared<POrganismFactory>(Limits, MutationRate, CrossLoci, Dimension, new Foo);
     GA<GriewankOrganism> ga(PopulationSize, Generations, Crossovers, sof);
     ga.run();
 
