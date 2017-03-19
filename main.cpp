@@ -5,12 +5,9 @@
 #include <algorithm>
 #include <bitset>
 #include <cstring>
-#include <cassert>
-#include "bit_ops.h"
-#include "Chromosome.hpp"
-#include "GA.hpp"
+#include <Nucleotide.hpp>
 
-using namespace bit_ops;
+#include "GA.hpp"
 
 static int Calls = 0;
 constexpr int Dimension = 10;
@@ -89,11 +86,13 @@ public:
 
 
 int main() {
+
     auto sof = std::make_shared<POrganismFactory<GriewankOrganism>>(
             std::vector<std::pair<double, double>>(10, {-50, 50}),
             MutationRate, CrossLoci, Dimension, new Foo);
     GA<GriewankOrganism> ga(PopulationSize, Generations, Crossovers, sof);
     ga.run();
+
     return 0;
 }
 
