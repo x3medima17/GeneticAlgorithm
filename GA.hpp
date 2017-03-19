@@ -7,6 +7,8 @@
 #include <random>
 #include <algorithm>
 #include <memory>
+#include <fstream>
+
 #include "Organism.hpp"
 #include "OrganismFactory.hpp"
 
@@ -26,14 +28,37 @@ public:
 
     std::vector<Organism> generate_population() const;
 
-    void run() const;
+    /**
+     * Returns vector of [min mean max]
+     */
+    std::vector<std::vector<double>> run() const;
 
     std::vector<Organism> next_generation(std::vector<Organism> V) const;
 
     std::vector<Organism> clean(std::vector<Organism> V) const;
 
+private:
+    std::vector<double> get_stats(const std::vector<Organism>& P) const;
+
 };
 
+
+template<class Organism>
+std::vector<double> GA<Organism>::get_stats(const std::vector<Organism>& P) const {
+    double min = std::numeric_limits<double>::max();
+    double max = std::numeric_limits<double>::min();
+    double sum = 0;
+    for(const auto& org : P){
+        auto curr = org.fitness;
+        sum += curr;
+        if(curr<min)
+            min = curr;
+        if(curr>max)
+            max = curr;
+    }
+    double mean = sum / (double)P.size();
+    return {min, mean, max};
+}
 
 template<class Organism>
 GA<Organism>::GA(const size_t PopulationSize, const size_t Generations, const size_t Crossovers,
@@ -55,17 +80,20 @@ std::vector<Organism> GA<Organism>::generate_population() const {
 }
 
 template<class Organism>
-void GA<Organism>::run()  const {
-	std::ofstream fout("C:\\Users\\dumitru.savva\\Documents\\ga.out");
-	fout << "begin\n";
-	fout.flush();
+std::vector<std::vector<double>> GA<Organism>::run()  const {
+    std::vector<std::vector<double>> stats;
+//	std::ofstream fout("C:\\Users\\dumitru.savva\\Documents\\ga.out");
+
 
     auto Population = generate_population();
+    stats.push_back(get_stats(Population));
     for (int i = 0; i < Generations; i++) {
         Population = next_generation(Population);
         std::cout << Population.front().fitness << std::endl;
-		fout << Population.front().fitness << std::endl;
+//		fout << Population.front().fitness << std::endl;
+        stats.push_back(get_stats(Population));
     }
+    return stats;
 
 }
 

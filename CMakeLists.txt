@@ -7,6 +7,6 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories(include)
 set(SOURCE_FILES
         main.cpp
-        src/test.cpp)
+        )
 
 add_executable(GA ${SOURCE_FILES})

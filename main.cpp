@@ -5,10 +5,9 @@
 #include <algorithm>
 #include <bitset>
 #include <cstring>
-#include <Nucleotide.hpp>
+#include "Nucleotide.hpp"
 
 #include "GA.hpp"
-#include "test.hpp"
 
 static int Calls = 0;
 constexpr int Dimension = 10;
@@ -108,13 +107,16 @@ public:
 
 int main() {
     auto Limits = std::vector<std::pair<double, double>>(10, {-50, 50});
-    test<int> a(5);
+
     XOF curr(Limits, MutationRate, CrossLoci, Dimension);
     GriewankOrganism g({10,19});
     auto sof = std::make_shared<POrganismFactory>(Limits, MutationRate, CrossLoci, Dimension, new Foo);
     GA<GriewankOrganism> ga(PopulationSize, Generations, Crossovers, sof);
-    ga.run();
-
+    auto stats = ga.run();
+    std::ofstream fout("stats.out");
+    for(const auto& gen : stats) {
+        fout<<gen[0]<<" "<<gen[1]<<" "<<gen[2]<<std::endl;
+    }
     return 0;
 }
 
