@@ -40,7 +40,10 @@ public:
 private:
     std::vector<double> get_stats(const std::vector<Organism>& P) const;
 
-};
+    std::vector<std::vector<double>> get_population_stats(std::vector<Organism> &P) const;
+
+
+    };
 
 
 template<class Organism>
@@ -80,18 +83,46 @@ std::vector<Organism> GA<Organism>::generate_population() const {
 }
 
 template<class Organism>
+std::vector<std::vector<double>>
+GA<Organism>::get_population_stats(std::vector<Organism> &P) const {
+    std::vector<std::vector<double>> out;
+    for(const auto& org : P) {
+        auto vec(org.DNA.get_vect());
+        vec.push_back(org.fitness);
+        out.push_back(vec);
+    }
+    return out;
+}
+
+template<class Organism>
 std::vector<std::vector<double>> GA<Organism>::run()  const {
     std::vector<std::vector<double>> stats;
 	std::ofstream fout("C:\\Users\\dumitru.savva\\Documents\\ga.out");
 
 
     auto Population = generate_population();
+    for(const auto& org : Population) {
+        std::vector<double> tmp {0};
+        auto V(org.DNA.get_vect());
+        tmp.insert(tmp.end(), V.begin(), V.end());
+        tmp.push_back(org.fitness);
+        stats.push_back(tmp);
+    }
+
     stats.push_back(get_stats(Population));
-    for (int i = 0; i < Generations; i++) {
+    for (size_t i = 1; i <= Generations; i++) {
         Population = next_generation(Population);
+
+        for(const auto& org : Population) {
+            std::vector<double> tmp {i};
+            auto V(org.DNA.get_vect());
+            tmp.insert(tmp.end(), V.begin(), V.end());
+            tmp.push_back(org.fitness);
+            stats.push_back(tmp);
+        }
+
         std::cout << Population.front().fitness << std::endl;
 		fout << Population.front().fitness << std::endl;
-        stats.push_back(get_stats(Population));
     }
     return stats;
 
@@ -100,6 +131,7 @@ std::vector<std::vector<double>> GA<Organism>::run()  const {
 template<class Organism>
 std::vector<Organism> GA<Organism>::next_generation(std::vector<Organism> V) const {
     // Cross
+
     for (int i = 0; i < Crossovers; i++) {
         auto parent1 = V.at(organism_index_dist(generator));
         auto parent2 = V.at(organism_index_dist(generator));

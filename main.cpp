@@ -114,8 +114,10 @@ int main() {
     GA<GriewankOrganism> ga(PopulationSize, Generations, Crossovers, sof);
     auto stats = ga.run();
     std::ofstream fout("stats.out");
-    for(const auto& gen : stats) {
-        fout<<gen[0]<<" "<<gen[1]<<" "<<gen[2]<<std::endl;
+    for(const auto& item: stats) {
+        for(const auto& val : item)
+            fout<<val<<" ";
+        fout<<std::endl;
     }
     return 0;
 }
