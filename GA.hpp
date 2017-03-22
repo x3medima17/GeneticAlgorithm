@@ -82,7 +82,7 @@ std::vector<Organism> GA<Organism>::generate_population() const {
 template<class Organism>
 std::vector<std::vector<double>> GA<Organism>::run()  const {
     std::vector<std::vector<double>> stats;
-//	std::ofstream fout("C:\\Users\\dumitru.savva\\Documents\\ga.out");
+	std::ofstream fout("C:\\Users\\dumitru.savva\\Documents\\ga.out");
 
 
     auto Population = generate_population();
@@ -90,7 +90,7 @@ std::vector<std::vector<double>> GA<Organism>::run()  const {
     for (int i = 0; i < Generations; i++) {
         Population = next_generation(Population);
         std::cout << Population.front().fitness << std::endl;
-//		fout << Population.front().fitness << std::endl;
+		fout << Population.front().fitness << std::endl;
         stats.push_back(get_stats(Population));
     }
     return stats;
