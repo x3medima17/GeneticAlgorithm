@@ -109,16 +109,24 @@ std::vector<std::vector<double>> GA<Organism>::run()  const {
         stats.push_back(tmp);
     }
 
-    stats.push_back(get_stats(Population));
+	std::ofstream sout("C:\\Users\\dumitru.savva\\Documents\\stats.out");
+	for (const auto& gen : stats) {
+		for (const auto& item : gen)
+			sout << item << " ";
+		sout << std::endl;
+	}
     for (size_t i = 1; i <= Generations; i++) {
         Population = next_generation(Population);
 
         for(const auto& org : Population) {
-            std::vector<double> tmp {i};
+            std::vector<double> tmp = { double(i)};
             auto V(org.DNA.get_vect());
             tmp.insert(tmp.end(), V.begin(), V.end());
             tmp.push_back(org.fitness);
             stats.push_back(tmp);
+			for (const auto& item : tmp)
+				sout << item << " ";
+			sout << std::endl;
         }
 
         std::cout << Population.front().fitness << std::endl;
