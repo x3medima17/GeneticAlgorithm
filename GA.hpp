@@ -12,7 +12,6 @@
 #include "Organism.hpp"
 #include "OrganismFactory.hpp"
 
-template<class Organism>
 class GA {
 private:
     const size_t Generations, PopulationSize, Crossovers;
@@ -20,11 +19,11 @@ private:
     mutable std::mt19937 generator{10};
     mutable std::uniform_int_distribution<size_t> organism_index_dist;
 
-    const std::shared_ptr<OrganismFactory<Organism>> organism_factory;
+    const std::shared_ptr<OrganismFactory> organism_factory;
 
 public:
     GA(const size_t PopulationSize, const size_t Generations, const size_t Crossovers,
-       std::shared_ptr<OrganismFactory<Organism>> organism_factory);
+       std::shared_ptr<OrganismFactory> organism_factory);
 
     std::vector<Organism> generate_population() const;
 
@@ -46,8 +45,7 @@ private:
     };
 
 
-template<class Organism>
-std::vector<double> GA<Organism>::get_stats(const std::vector<Organism>& P) const {
+std::vector<double> GA::get_stats(const std::vector<Organism>& P) const {
     double min = std::numeric_limits<double>::max();
     double max = std::numeric_limits<double>::min();
     double sum = 0;
@@ -63,9 +61,8 @@ std::vector<double> GA<Organism>::get_stats(const std::vector<Organism>& P) cons
     return {min, mean, max};
 }
 
-template<class Organism>
-GA<Organism>::GA(const size_t PopulationSize, const size_t Generations, const size_t Crossovers,
-                 std::shared_ptr<OrganismFactory<Organism>> organism_factory) :
+GA::GA(const size_t PopulationSize, const size_t Generations, const size_t Crossovers,
+                 std::shared_ptr<OrganismFactory> organism_factory) :
         Generations(Generations),
         PopulationSize(PopulationSize),
         Crossovers(Crossovers),
@@ -73,8 +70,7 @@ GA<Organism>::GA(const size_t PopulationSize, const size_t Generations, const si
         organism_factory(organism_factory) {
 }
 
-template<class Organism>
-std::vector<Organism> GA<Organism>::generate_population() const {
+std::vector<Organism> GA::generate_population() const {
     std::vector<Organism> Population;
     for (auto i = 0; i < PopulationSize; i++)
         Population.push_back(organism_factory->generate());
@@ -82,9 +78,8 @@ std::vector<Organism> GA<Organism>::generate_population() const {
     return Population;
 }
 
-template<class Organism>
 std::vector<std::vector<double>>
-GA<Organism>::get_population_stats(std::vector<Organism> &P) const {
+GA::get_population_stats(std::vector<Organism> &P) const {
     std::vector<std::vector<double>> out;
     for(const auto& org : P) {
         auto vec(org.DNA.get_vect());
@@ -94,8 +89,7 @@ GA<Organism>::get_population_stats(std::vector<Organism> &P) const {
     return out;
 }
 
-template<class Organism>
-std::vector<std::vector<double>> GA<Organism>::run()  const {
+std::vector<std::vector<double>> GA::run()  const {
     std::vector<std::vector<double>> stats;
 	std::ofstream fout("C:\\Users\\dumitru.savva\\Documents\\ga.out");
 
@@ -115,7 +109,8 @@ std::vector<std::vector<double>> GA<Organism>::run()  const {
 			sout << item << " ";
 		sout << std::endl;
 	}
-    for (size_t i = 1; i <= Generations; i++) {
+	
+	for (size_t i = 1; i <= Generations; i++) {
         Population = next_generation(Population);
 
         for(const auto& org : Population) {
@@ -132,12 +127,21 @@ std::vector<std::vector<double>> GA<Organism>::run()  const {
         std::cout << Population.front().fitness << std::endl;
 		fout << Population.front().fitness << std::endl;
     }
+    auto best = Population.front();
+    organism_factory->compute_fitness(best);
+    int idx = 0;
+    auto lims = organism_factory->Limits;
+    assert(best.DNA.get_vect().size() == lims.size());
+    for(auto item: best.DNA.get_vect()){
+        std::cout<<organism_factory->normalize(item, lims.at(idx).first, lims.at(idx).second)<<" ";
+        idx++;
+    }
+    std::cout<<" -- "<<best.fitness<<std::endl;
     return stats;
 
 }
 
-template<class Organism>
-std::vector<Organism> GA<Organism>::next_generation(std::vector<Organism> V) const {
+std::vector<Organism> GA::next_generation(std::vector<Organism> V) const {
     // Cross
 
     for (int i = 0; i < Crossovers; i++) {
@@ -157,8 +161,7 @@ std::vector<Organism> GA<Organism>::next_generation(std::vector<Organism> V) con
     return clean(V);
 }
 
-template<class Organism>
-std::vector<Organism> GA<Organism>::clean(std::vector<Organism> V) const {
+std::vector<Organism> GA::clean(std::vector<Organism> V) const {
     for (auto it = V.begin(); it != V.end(); it++)
         if (std::isnan((*it).fitness) || std::isinf((*it).fitness)) {
             V.erase(it);
