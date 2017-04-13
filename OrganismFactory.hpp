@@ -29,6 +29,9 @@ public:
 
     virtual double normalize(double x, double L, double R) const;
 
+    virtual std::vector<double> normalize(const std::vector<double>& V) const;
+
+
     virtual double compute_fitness(const Organism org) const = 0;
 
 };
@@ -48,6 +51,14 @@ OrganismFactory::OrganismFactory(const std::vector<std::pair<double, double>> &L
 double OrganismFactory::normalize(double x, double L, double R) const {
     return L + x*(R-L);
 }
+
+std::vector<double> OrganismFactory::normalize(const std::vector<double>& V) const {
+    std::vector<double> out(V.size());
+    for(size_t i=0; i<V.size(); i++)
+        out.at(i) = Limits.at(i).first + V.at(i) * (Limits.at(i).second - Limits.at(i).first);
+    return out;
+};
+
 
 Organism OrganismFactory::generate() const {
     std::vector<double> V(Dimension);

@@ -9,12 +9,12 @@
 #include "GA.hpp"
 
 static int Calls = 0;
-constexpr int Dimension = 20;
-constexpr int Generations = 300;
+constexpr int Dimension = 16;
+constexpr int Generations = 100;
 constexpr int PopulationSize = 100;
 constexpr size_t Crossovers = static_cast<size_t >(PopulationSize * 0.7);
 constexpr double MutationRate = 0.825;
-constexpr size_t acc = 40;
+constexpr size_t acc = 60;
 constexpr int CrossLoci = 32;
 
 static_assert(CrossLoci % 2 == 0, "Even Loci");
@@ -27,19 +27,16 @@ public:
     OrganismFactory(Limits, MutationRate, CrossLoci, Dimension, acc) {}
 
     double compute_fitness(const Organism a) const override {
-        auto V = a.DNA.get_vect();
+        auto V = normalize(a.DNA.get_vect());
 
         for (size_t i = 0; i < Limits.size(); i++)
             if (V.at(i) < Limits.at(i).first || V.at(i) > Limits.at(i).second)
                 return std::numeric_limits<double>::max();
 
         double res = 0;
-        size_t idx = 0;
         for (auto item : V)
-        {
-            item = normalize(item, Limits.at(idx).first, Limits.at(idx).second);
             res += item * item / 4000.0;
-        }
+
         double tmp = 1;
         double i = 1;
         for (const auto &item : V)
@@ -59,13 +56,22 @@ int main() {
             (Limits, MutationRate, CrossLoci, Dimension, acc);
     GA ga(PopulationSize, Generations, Crossovers, sof);
 
-    auto stats = ga.run();
-    std::ofstream fout("stats.out");
-    for(const auto& item: stats) {
-        for(const auto& val : item)
-            fout<<val<<" ";
-        fout<<std::endl;
-    }
-    std::cout<<Calls;
+    std::string stats_fname = "stats.out";
+    std::ofstream stats_out(stats_fname);
+    std::ofstream ga_out("ga.out");
+    int gen = 0;
+    auto stats = ga.run([&stats_out, &gen, &sof, &ga_out](const auto& Population){
+        std::cout<<Population.front().fitness<<std::endl;
+        ga_out<<gen<<std::endl;
+        for (const auto &org : Population) {
+            stats_out<<gen<<" ";
+            auto V(sof->normalize(org.DNA.get_vect()));
+            for(auto val : V)
+                stats_out<<val<<" ";
+            stats_out<<org.fitness<<std::endl;
+        }
+        gen++;
+    });
+
     return 0;
 }
