@@ -12,11 +12,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b71458a9-d084-4c31-8d4f-5e1789b1fc40" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GA.hpp" afterPath="$PROJECT_DIR$/GA.hpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Gene.hpp" afterPath="$PROJECT_DIR$/Gene.hpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/OrganismFactory.hpp" afterPath="$PROJECT_DIR$/OrganismFactory.hpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.cpp" afterPath="$PROJECT_DIR$/main.cpp" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/GA.dir/main.cpp.o" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/cmake-build-debug/GA" afterPath="" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -386,7 +383,7 @@
       <workItem from="1492035710643" duration="988000" />
       <workItem from="1492066092763" duration="3865000" />
       <workItem from="1492078353168" duration="1150000" />
-      <workItem from="1492079534380" duration="30835000" />
+      <workItem from="1492079534380" duration="30913000" />
     </task>
     <task id="LOCAL-00001" summary="lambda">
       <created>1492066344767</created>
@@ -399,7 +396,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="64545000" />
+    <option name="totallyTimeSpent" value="64623000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-3" y="31" width="1606" height="1123" extended-state="6" />
