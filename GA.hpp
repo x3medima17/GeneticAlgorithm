@@ -12,6 +12,7 @@
 #include "Organism.hpp"
 #include "OrganismFactory.hpp"
 
+
 class GA {
 private:
     const size_t Generations, PopulationSize, Crossovers;
@@ -20,6 +21,7 @@ private:
     mutable std::uniform_int_distribution<size_t> organism_index_dist;
 
     const std::shared_ptr<OrganismFactory> organism_factory;
+
 
 public:
     GA(const size_t PopulationSize, const size_t Generations, const size_t Crossovers,
@@ -68,6 +70,9 @@ GA::GA(const size_t PopulationSize, const size_t Generations, const size_t Cross
         Crossovers(Crossovers),
         organism_index_dist(0, PopulationSize - 1),
         organism_factory(organism_factory) {
+
+
+
 }
 
 std::vector<Organism> GA::generate_population() const {
@@ -109,17 +114,25 @@ std::vector<std::vector<double>> GA::run(std::function<void(const std::vector<Or
 }
 
 std::vector<Organism> GA::next_generation(std::vector<Organism> V) const {
-    // Cross
+    std::vector<Organism> Buffer;
 
+    //No fitness computed
     for (int i = 0; i < Crossovers; i++) {
         auto parent1 = V.at(organism_index_dist(generator));
         auto parent2 = V.at(organism_index_dist(generator));
 
         std::pair<Organism, Organism> res = organism_factory->crossover(parent1, parent2);
 
-        V.push_back(res.first);
-        V.push_back(res.second);
+        Buffer.push_back(res.first);
+        Buffer.push_back(res.second);
     }
+
+    //Assign fitnesses
+    for(auto& org : Buffer)
+        org.set_fitness(organism_factory->compute_fitness(org));
+
+
+    V.insert(V.end(), Buffer.begin(), Buffer.end());
     //Sort
     std::sort(V.begin(), V.end(),
               [](const Organism &a, const Organism &b) {
