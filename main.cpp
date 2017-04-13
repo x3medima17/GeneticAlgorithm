@@ -27,7 +27,7 @@ constexpr int CrossLoci = 32;
 
 static_assert(CrossLoci % 2 == 0, "Even Loci");
 
-class GriewankFactory : public  OrganismFactory, public QObject {
+class GriewankFactory : public  OrganismFactory {
 private:
     QUdpSocket* socket;
 public:
@@ -36,7 +36,6 @@ public:
                     const size_t Dimension, size_t acc) :
     OrganismFactory(Limits, MutationRate, CrossLoci, Dimension, acc){
         socket = new QUdpSocket;
-//        auto tmp(QUdpSocket());
 
         socket->bind(QHostAddress::LocalHost, 12345);
 
