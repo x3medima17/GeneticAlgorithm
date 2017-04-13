@@ -54,13 +54,27 @@ void Gene::print() const {
     std::cout<<std::endl;
 }
 
+long long pow2(int e){
+    if (e==0)
+        return 1;
+    if(e%2 == 0){
+        auto tmp = pow2(e/2);
+        return tmp*tmp;
+    }
+
+    return pow2(e-1)*2;
+}
+
 double Gene::get_value() const {
     double out = 0;
-    double sum = 0;
+    long double sum = 0;
+    long long c = pow2(acc)-1;
     for(int i=0; i<acc;i++)
-        sum += nucleotides.at(i) * (1<<i);
+        sum += nucleotides.at(i) * pow2(i);
 
-    out = sum/((1<<acc) - 1);
+    out = sum/c;
+    assert(sum <= c);
+    assert(out >= 0 && out <= 1);
     return out;
 }
 

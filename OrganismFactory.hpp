@@ -34,6 +34,8 @@ public:
 
     virtual double compute_fitness(const Organism org) const = 0;
 
+    virtual ~OrganismFactory(){}
+
 };
 
 OrganismFactory::OrganismFactory(const std::vector<std::pair<double, double>> &Limits, const double MutationRate,
@@ -94,6 +96,7 @@ std::pair<Organism, Organism> OrganismFactory::crossover(const Organism &parent1
         for(size_t j = loci.at(i); j<loci.at(i+1); j++)
             std::swap(a.at(j), b.at(j));
 
+
     //mutation_dist(generator) < 0.5 returns bit index [0,1]
     if(mutation_dist(generator) > MutationRate)
         a.at(nucleotide_index_dist(generator)) = mutation_dist(generator) < 0.5;
@@ -104,8 +107,8 @@ std::pair<Organism, Organism> OrganismFactory::crossover(const Organism &parent1
     Organism child1{ Chromosome(a, acc) };
     Organism child2{ Chromosome(b, acc) };
 
-    child1.set_fitness(compute_fitness(child1));
-    child2.set_fitness(compute_fitness(child2));
+//    child1.set_fitness(compute_fitness(child1));
+//    child2.set_fitness(compute_fitness(child2));
 
 
     return std::make_pair(child1,child2);

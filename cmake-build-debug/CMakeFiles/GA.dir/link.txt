@@ -1,0 +1,1 @@
+/usr/bin/c++    -fPIC -g  -Wl,-rpath,/home/dumitru/Qt/5.4/gcc_64/lib CMakeFiles/GA.dir/main.cpp.o  -o GA  -L/home/dumitru/Qt/5.4/gcc_64/lib -lQt5Network -lQt5Core -Wl,-rpath,/home/dumitru/Qt/5.4/gcc_64/lib 
