@@ -49,6 +49,8 @@ iostream
 /home/dumitru/GeneticAlgorithm/Organism.hpp
 Chromosome.hpp
 /home/dumitru/GeneticAlgorithm/Chromosome.hpp
+map
+-
 
 /home/dumitru/GeneticAlgorithm/OrganismFactory.hpp
 utility

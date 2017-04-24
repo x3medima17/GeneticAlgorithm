@@ -32,7 +32,7 @@ public:
     virtual std::vector<double> normalize(const std::vector<double>& V) const;
 
 
-    virtual double compute_fitness(const Organism org) const = 0;
+    virtual std::map<std::string, double> compute_fitness(const Organism org) const = 0;
 
     virtual ~OrganismFactory(){}
 
@@ -77,7 +77,10 @@ Organism OrganismFactory::generate() const {
     }
 
     Organism o{Chromosome(V, acc)};
-    o.set_fitness(compute_fitness(o));
+
+    o.misc = compute_fitness(o);
+    o.set_fitness(o.misc.find("delta")->second);
+
     return o;
 }
 

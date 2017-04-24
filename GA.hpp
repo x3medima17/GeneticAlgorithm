@@ -128,8 +128,10 @@ std::vector<Organism> GA::next_generation(std::vector<Organism> V) const {
     }
 
     //Assign fitnesses
-    for(auto& org : Buffer)
-        org.set_fitness(organism_factory->compute_fitness(org));
+    for(auto& org : Buffer) {
+        org.misc = organism_factory->compute_fitness(org);
+        org.set_fitness(org.misc.find("delta")->second);
+    }
 
 
     V.insert(V.end(), Buffer.begin(), Buffer.end());

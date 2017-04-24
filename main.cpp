@@ -27,6 +27,8 @@ constexpr int CrossLoci = 32;
 
 static_assert(CrossLoci % 2 == 0, "Even Loci");
 
+using misc_map = std::map<std::string, double>;
+
 class GriewankFactory : public  OrganismFactory {
 private:
     QUdpSocket* socket;
@@ -53,14 +55,14 @@ public:
         return res;
     }
 
-    double compute_fitness(const Organism a) const override {
+    misc_map compute_fitness(const Organism a) const override {
         auto V = normalize(a.DNA.get_vect());
 
         Calls++;
         for (size_t i = 0; i < Limits.size(); i++)
             if (V.at(i) < Limits.at(i).first || V.at(i) > Limits.at(i).second){
                 std::cout<<i<<" "<<V.at(i)<<" "<<a.DNA.get_vect()[i]<<std::endl;
-                return std::numeric_limits<double>::max();
+                return misc_map {{"delta", std::numeric_limits<double>::max()}};
             }
 
 
@@ -100,7 +102,7 @@ public:
 //            std::cout<<status<<" "<<message<<" "<<uuidp.toStdString()<<" "<<uuid.toStdString()<<std::endl;
             assert(uuidp == uuid);
             if (uuidp == uuid && status == 0 )
-                return rootObject.value("delta").toDouble();
+                return misc_map{{"delta", rootObject.value("delta").toDouble()}};
             else
                 Misses++;
 
@@ -114,7 +116,7 @@ public:
 
         socket.writeDatagram(Data, QHostAddress::LocalHost, 8989);
 
-        return delta;
+        return misc_map{{"delta", delta}};
     }
 
     ~GriewankFactory() {
