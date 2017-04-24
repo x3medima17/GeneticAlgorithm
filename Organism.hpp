@@ -5,9 +5,10 @@
 #pragma once
 
 #include "Chromosome.hpp"
-
+#include <map>
 class Organism {
 public:
+    std::map<std::string, double> misc;
     double fitness = 0;
 
     Chromosome DNA;
