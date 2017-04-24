@@ -17,7 +17,7 @@ class GA {
 private:
     const size_t Generations, PopulationSize, Crossovers;
 
-    mutable std::mt19937 generator{10};
+    mutable std::mt19937 generator;
     mutable std::uniform_int_distribution<size_t> organism_index_dist;
 
     const std::shared_ptr<OrganismFactory> organism_factory;
@@ -28,7 +28,7 @@ public:
 
 
     GA(const size_t PopulationSize, const size_t Generations, const size_t Crossovers,
-       std::shared_ptr<OrganismFactory> organism_factory);
+       std::shared_ptr<OrganismFactory> organism_factory, int seed);
 
     std::vector<Organism> generate_population() const;
 
@@ -67,12 +67,13 @@ std::vector<double> GA::get_stats(const std::vector<Organism> &P) const {
 }
 
 GA::GA(const size_t PopulationSize, const size_t Generations, const size_t Crossovers,
-       std::shared_ptr<OrganismFactory> organism_factory) :
+       std::shared_ptr<OrganismFactory> organism_factory, int seed) :
         Generations(Generations),
         PopulationSize(PopulationSize),
         Crossovers(Crossovers),
         organism_index_dist(0, PopulationSize - 1),
-        organism_factory(organism_factory) {
+        organism_factory(organism_factory),
+        generator(seed){
 
 
 
@@ -104,7 +105,6 @@ GA::get_population_stats(std::vector<Organism> &P) const {
 
 std::vector<std::vector<double>> GA::run(std::function<void(const std::vector<Organism>&)> func) const {
     std::vector<std::vector<double>> stats;
-
 
     auto Population = generate_population();
     func(Population);

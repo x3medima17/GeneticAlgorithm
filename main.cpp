@@ -17,12 +17,12 @@
 static int Calls = 0;
 static int Lost  = 0;
 static int Misses = 0;
-constexpr int Dimension = 2;
+constexpr int Dimension = 24;
 constexpr int Generations = 50;
-constexpr int PopulationSize = 100;
+constexpr int PopulationSize = 80;
 constexpr size_t Crossovers = static_cast<size_t >(PopulationSize * 0.7);
-constexpr double MutationRate = 0.825;
-constexpr size_t acc = 60;
+constexpr double MutationRate = 0.1;
+constexpr size_t acc = 24;
 constexpr int CrossLoci = 32;
 
 static_assert(CrossLoci % 2 == 0, "Even Loci");
@@ -87,7 +87,7 @@ public:
 //        TODO
         QByteArray buff;
         buff.resize(1<<13);
-        int ttl = 30000;
+        int ttl = 0000;
         while(!socket.hasPendingDatagrams() && ttl--);
         qint64 n = socket.readDatagram(buff.data(), buff.size(),
                                      &sender, &senderPort);
@@ -133,13 +133,16 @@ int main() {
 
     auto sof = std::make_shared<GriewankFactory>
             (Limits, MutationRate, CrossLoci, Dimension, acc);
-    GA ga(PopulationSize, Generations, Crossovers, sof);
+    GA ga(PopulationSize, Generations, Crossovers, sof, 1);
 
     std::string stats_fname = "stats.out";
     std::ofstream stats_out(stats_fname);
     std::ofstream ga_out("ga.out");
+
+
     int gen = 0;
-    auto stats = ga.run([&stats_out, &gen, &sof, &ga_out](const auto& Population){
+
+    auto func = [&stats_out, &gen, &sof, &ga_out](const auto& Population){
         std::cout<<Population.front().fitness<<std::endl;
         ga_out<<gen<<std::endl;
         for (const auto &org : Population) {
@@ -150,7 +153,38 @@ int main() {
             stats_out<<org.fitness<<std::endl;
         }
         gen++;
-    });
+    };
+
+    size_t nPopulations = 5;
+    std::vector<GA> GAs;
+    std::vector<std::vector<Organism>> Populations(nPopulations);
+    int i=0;
+    for(auto& population : Populations) {
+        GAs.emplace_back(GA(PopulationSize, Generations, Crossovers, sof, i++));
+        population = GAs.back().generate_population();
+    }
+
+
+    for(int i=1; i<=Generations; i++) {
+        for(auto& population : Populations) {
+            population = ga.next_generation(population);
+            std::cout<<population.front().fitness<<std::endl;
+        }
+        std::cout<<std::endl;
+//        continue;
+        //Migration
+        if(i % 10 == 0) {
+            for(int j=0; j<Populations.size(); j++) {
+                int to_migrate = int(Populations[j].size() * 0.02);
+                std::vector<Organism> tmp(Populations[j].begin(), Populations[j].begin()+to_migrate);
+                auto id = (j+1) % Populations.size();
+                Populations[id].insert(Populations[id].end(), tmp.begin(), tmp.end());
+            }
+
+        }
+//        func(Population);
+    }
+
     double lose_rate = (Lost*1.0/Calls*1.0)*100;
     std::cout<<"Calls:\t"<<Calls<<"\n"
              <<"Lost:\t"<<Lost<<" "<<lose_rate<<"%\n"
