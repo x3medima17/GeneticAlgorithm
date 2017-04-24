@@ -62,7 +62,7 @@ public:
         for (size_t i = 0; i < Limits.size(); i++)
             if (V.at(i) < Limits.at(i).first || V.at(i) > Limits.at(i).second){
                 std::cout<<i<<" "<<V.at(i)<<" "<<a.DNA.get_vect()[i]<<std::endl;
-                return misc_map {{"delta", std::numeric_limits<double>::max()}};
+                return GA::misc_map {{"delta", std::numeric_limits<double>::max()}};
             }
 
 

@@ -24,6 +24,9 @@ private:
 
 
 public:
+    using misc_map = std::map<std::string, double>;
+
+
     GA(const size_t PopulationSize, const size_t Generations, const size_t Crossovers,
        std::shared_ptr<OrganismFactory> organism_factory);
 

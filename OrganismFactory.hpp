@@ -36,8 +36,6 @@ public:
 
     virtual ~OrganismFactory(){}
 
-    virtual ~OrganismFactory(){}
-
 };
 
 OrganismFactory::OrganismFactory(const std::vector<std::pair<double, double>> &Limits, const double MutationRate,
